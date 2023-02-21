@@ -1,14 +1,14 @@
 from pydantic import BaseModel, EmailStr, Field
 
 
-class UserOut(BaseModel):
+class UserResponse(BaseModel):
     """
     Данные об игроке, на отправку
     """
     username: str = Field(..., description='Имя игрока.')
 
 
-class UserValidation(UserOut):
+class UserValidation(UserResponse):
     """
     Валидация данных для регистрации игрока
     """
@@ -17,7 +17,7 @@ class UserValidation(UserOut):
     phone: str = Field(..., regex=(r'^(\+[78]|[78])[\d]{10}$'), description='Номер телефона игрока.')
 
 
-class DatabaseUserResult(UserValidation):
+class UserInfo(UserValidation):
     """
     Обработка данных из бд
     """
@@ -27,14 +27,14 @@ class DatabaseUserResult(UserValidation):
         orm_mode = True
 
 
-class GameValidation(BaseModel):
+class GameInfo(BaseModel):
     """
-    Валидация названия игры, для соответствия длины
+    Валидация названия игры, на соответствия длины
     """
     game_name: str = Field(..., max_length=50, description='Имя создаваемой игры.')
 
 
-class DatabaseGameResult(GameValidation, BaseModel):
+class DatabaseGameResult(GameInfo, BaseModel):
     """
     Инофрмация об игре из бд
     """
@@ -44,17 +44,17 @@ class DatabaseGameResult(GameValidation, BaseModel):
         orm_mode = True
 
 
-class FullUserInfo(BaseModel):
+class UserDetails(BaseModel):
     """
     Отображение связи игрока со всеми играми, в которых он был
     """
-    player: DatabaseUserResult = Field(..., description='Инофрмация об игроке.')
+    player: UserInfo = Field(..., description='Инофрмация об игроке.')
     games: list[DatabaseGameResult] = Field(default=[], description='Список игр, в которых был игрок')
 
 
-class FullGamesInfo(BaseModel):
+class GameDetails(BaseModel):
     """
     Отображение связи игрока со всеми играми, в которых он был
     """
     game: DatabaseGameResult = Field(..., description='Инофрмация об игре.')
-    players: list[DatabaseUserResult] = Field(default=[], description='Список игроков, которые учавствовали в игре')
+    players: list[UserInfo] = Field(default=[], description='Список игроков, которые учавствовали в игре')

@@ -1,15 +1,15 @@
+from database import Players, Games
+from config import (UserValidation, GameInfo, UserInfo,
+                    UserResponse, UserDetails, GameDetails, DataSettings, AppDescription)
 from fastapi import FastAPI, Body
 from fastapi.responses import Response
 from tortoise.contrib.fastapi import register_tortoise
-from database import Players, Games
-from config import (UserValidation, GameValidation, DatabaseUserResult,
-                    UserOut, FullUserInfo, FullGamesInfo, DataSettings, AppDescription)
 
 
 app = FastAPI(**AppDescription().dict())
 
 
-@app.post('/user/create', response_model=UserOut)
+@app.post('/user/registration', response_model=UserResponse)
 async def user_registration(user: UserValidation):
     """
     Регистрация пользователя/игрока
@@ -19,17 +19,16 @@ async def user_registration(user: UserValidation):
     return user
 
 
-@app.get('/user/all', response_model=list[DatabaseUserResult])
-async def all_users():
+@app.get('/user/list', response_model=list[UserInfo])
+async def list_users():
     """
     Возвращает список всех пользователей
     """
-    users = await Players.all()
 
-    return users
+    return await Players.all()
 
 
-@app.post('/user/delete', response_model=UserOut)
+@app.post('/user/delete', response_model=UserResponse)
 async def user_delete_from_db(user: UserValidation):
     """
     Удаление пользователя
@@ -39,19 +38,18 @@ async def user_delete_from_db(user: UserValidation):
     return user
 
 
-@app.post('/user/fullinfo', response_model=FullUserInfo)
-async def user_full_info(user: UserValidation):
+@app.post('/user/details', response_model=UserDetails)
+async def user_details(user: UserValidation):
     """
     Полная информация об игроке
     """
     player = await Players.get(**user.dict()).prefetch_related('games')
-    res = {'player': player, 'games': player.games.related_objects}
 
-    return res
+    return {'player': player, 'games': player.games.related_objects}
 
 
-@app.post('/game/create', response_model=GameValidation)
-async def game_create(game: GameValidation):
+@app.post('/game/create', response_model=GameInfo)
+async def game_create(game: GameInfo):
     """
     Регистрация игры
     """
@@ -60,8 +58,8 @@ async def game_create(game: GameValidation):
     return game
 
 
-@app.post('/game/delete', response_model=GameValidation)
-async def game_delete_from_db(game: GameValidation):
+@app.post('/game/delete', response_model=GameInfo)
+async def game_delete_from_db(game: GameInfo):
     """
     Удаление игры из базы данных
     """
@@ -70,8 +68,8 @@ async def game_delete_from_db(game: GameValidation):
     return game
 
 
-@app.get('/games/fullinfo', response_model=list[FullGamesInfo])
-async def game_full_info():
+@app.get('/games/details', response_model=list[GameDetails])
+async def game_details():
     """
     Список всех игр и связанных с ними игроков
     """
@@ -82,7 +80,7 @@ async def game_full_info():
 
 @app.post('/create-relation')
 async def relation_create(
-        game: GameValidation,
+        game: GameInfo,
         id_users: list = Body()
 ) -> Response:
     """
