@@ -38,6 +38,8 @@ class DatabaseGameResult(GameValidation, BaseModel):
     """
     Инофрмация об игре из бд
     """
+    id: int = Field(..., description='Айди игры.')
+
     class Config:
         orm_mode = True
 
