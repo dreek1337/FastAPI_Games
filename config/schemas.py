@@ -3,7 +3,7 @@ from pydantic import BaseModel, EmailStr, Field
 
 class UserOut(BaseModel):
     """
-    Данные на отправку
+    Данные об игроке, на отправку
     """
     username: str = Field(..., description='Имя игрока.')
 
@@ -19,7 +19,7 @@ class UserValidation(UserOut):
 
 class DatabaseUserResult(UserValidation):
     """
-    Ответ сервера
+    Обработка данных из бд
     """
     id: int = Field(..., description='Айди игрока.')
 

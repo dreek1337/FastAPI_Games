@@ -94,6 +94,7 @@ async def relation_create(
 
     return Response(content=str(len(res)))
 
+
 register_tortoise(
     app,
     db_url=DataSettings().db_connection,
