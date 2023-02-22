@@ -1,15 +1,14 @@
 from database import Players, Games
 from config import (UserValidation, GameInfo, UserInfo,
                     UserResponse, UserDetails, GameDetails, DataSettings, AppDescription)
-from fastapi import FastAPI, Body
+from fastapi import FastAPI, Body, status
 from fastapi.responses import Response
 from tortoise.contrib.fastapi import register_tortoise
-
 
 app = FastAPI(**AppDescription().dict())
 
 
-@app.post('/user/registration', response_model=UserResponse)
+@app.post('/user/registration', response_model=UserResponse, status_code=status.HTTP_201_CREATED)
 async def user_registration(user: UserValidation):
     """
     Регистрация пользователя/игрока
@@ -19,7 +18,7 @@ async def user_registration(user: UserValidation):
     return user
 
 
-@app.get('/user/list', response_model=list[UserInfo])
+@app.get('/user/list', response_model=list[UserInfo], status_code=status.HTTP_200_OK)
 async def list_users():
     """
     Возвращает список всех пользователей
@@ -28,17 +27,15 @@ async def list_users():
     return await Players.all()
 
 
-@app.post('/user/delete', response_model=UserResponse)
+@app.post('/user/delete', status_code=status.HTTP_204_NO_CONTENT)
 async def user_delete_from_db(user: UserValidation):
     """
     Удаление пользователя
     """
     await Players.filter(**user.dict()).delete()
 
-    return user
 
-
-@app.post('/user/details', response_model=UserDetails)
+@app.post('/user/details', response_model=UserDetails, status_code=status.HTTP_200_OK)
 async def user_details(user: UserValidation):
     """
     Полная информация об игроке
@@ -48,7 +45,7 @@ async def user_details(user: UserValidation):
     return {'player': player, 'games': player.games.related_objects}
 
 
-@app.post('/game/create', response_model=GameInfo)
+@app.post('/game/create', response_model=GameInfo, status_code=status.HTTP_201_CREATED)
 async def game_create(game: GameInfo):
     """
     Регистрация игры
@@ -58,17 +55,15 @@ async def game_create(game: GameInfo):
     return game
 
 
-@app.post('/game/delete', response_model=GameInfo)
+@app.post('/game/delete', status_code=status.HTTP_204_NO_CONTENT)
 async def game_delete_from_db(game: GameInfo):
     """
     Удаление игры из базы данных
     """
     await Games.filter(**game.dict()).delete()
 
-    return game
 
-
-@app.get('/games/details', response_model=list[GameDetails])
+@app.get('/games/details', response_model=list[GameDetails], status_code=status.HTTP_200_OK)
 async def game_details():
     """
     Список всех игр и связанных с ними игроков
@@ -78,7 +73,7 @@ async def game_details():
     return [{'game': i, 'players': i.players.related_objects} for i in games]
 
 
-@app.post('/create-relation')
+@app.post('/create-relation', status_code=status.HTTP_201_CREATED)
 async def relation_create(
         game: GameInfo,
         id_users: list = Body()
