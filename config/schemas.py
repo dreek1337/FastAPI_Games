@@ -15,6 +15,11 @@ class UserValidation(UserResponse):
     age: int = Field(..., ge=0, le=100, description='Возраст игрока.')
     email: EmailStr = Field(..., description='Почта игрока.')
     phone: str = Field(..., regex=(r'^(\+[78]|[78])[\d]{10}$'), description='Номер телефона игрока.')
+    telegram_id: int = Field(..., description='Телеграм айди пользователя')
+
+
+class RegistrationUser(UserValidation):
+    password: str = Field(..., min_length=8, max_length=128, description='Пароль игрока.')
 
 
 class UserInfo(UserValidation):
@@ -44,17 +49,15 @@ class DatabaseGameResult(GameInfo, BaseModel):
         orm_mode = True
 
 
-class UserDetails(BaseModel):
+class UserDetails(UserInfo, BaseModel):
     """
     Отображение связи игрока со всеми играми, в которых он был
     """
-    player: UserInfo = Field(..., description='Инофрмация об игроке.')
-    games: list[DatabaseGameResult] = Field(default=[], description='Список игр, в которых был игрок')
+    all_games: list[DatabaseGameResult] = Field(default=[], description='Список игр, в которых был игрок')
 
 
-class GameDetails(BaseModel):
+class GameDetails(DatabaseGameResult, BaseModel):
     """
     Отображение связи игрока со всеми играми, в которых он был
     """
-    game: DatabaseGameResult = Field(..., description='Инофрмация об игре.')
-    players: list[UserInfo] = Field(default=[], description='Список игроков, которые учавствовали в игре')
+    all_players: list[UserInfo] = Field(default=[], description='Список игроков, которые учавствовали в игре')
