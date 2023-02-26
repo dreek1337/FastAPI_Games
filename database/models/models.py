@@ -8,8 +8,8 @@ class Players(Model):
     age = fields.IntField()
     email = fields.TextField()
     phone = fields.CharField(max_length=12)
-    password = fields.CharField(max_length=128, null=True)
-    telegram_id = fields.IntField(null=True)
+    password = fields.CharField(max_length=128, default='Пусто', null=False)
+    telegram_id = fields.IntField(unique=True, null=True)
     games = fields.ManyToManyField(
         model_name='models.Games',
         related_name='players',

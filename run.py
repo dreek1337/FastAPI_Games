@@ -19,10 +19,6 @@ async def user_registration(user: RegistrationUser):
     """
     Регистрация пользователя/игрока
     """
-    check_id = await Players.exists(telegram_id=user.telegram_id)
-
-    if check_id:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Not unique id')
 
     return await Players.create(**user.dict())
 
