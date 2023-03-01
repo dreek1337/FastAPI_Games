@@ -15,7 +15,7 @@ class UserValidation(UserResponse):
     age: int = Field(..., ge=0, le=100, description='Возраст игрока.')
     email: EmailStr = Field(..., description='Почта игрока.')
     phone: str = Field(..., regex=(r'^(\+[78]|[78])[\d]{10}$'), description='Номер телефона игрока.')
-    telegram_id: int = Field(..., description='Телеграм айди пользователя')
+    telegram_id: int | None = Field(..., description='Телеграм айди пользователя')
 
 
 class RegistrationUser(UserValidation):

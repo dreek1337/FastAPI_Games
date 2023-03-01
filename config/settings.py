@@ -1,7 +1,13 @@
-from pydantic import BaseSettings, Field
+from pydantic import BaseModel, BaseSettings, Field
 
 
-class DataSettings(BaseSettings):
+class PydanticSettings(BaseSettings):
+    class Config:
+        env_file = ".env"
+        env_file_encoding = "utf-8"
+
+
+class DataSettings(PydanticSettings):
     """
     Валидация .env для подключения к базе данных
     """
@@ -11,20 +17,32 @@ class DataSettings(BaseSettings):
     db_host: str = Field(..., env='DATABASE_HOST')
     db_port: int = Field(5432, env='DATABASE_PORT')
 
-    class Config:
-        env_file = ".env"
-        env_file_encoding = "utf-8"
-
     @property
     def db_connection(self):
         return f"postgres://{self.db_user}:{self.db_password}@{self.db_host}:{self.db_port}/{self.db_name}"
 
 
-class AppDescription(BaseSettings):
+class AppDescription(PydanticSettings):
     version: float = Field(..., env='FGAMES_VERSION')
     title: str = Field(..., env='FGAMES_TITLE')
     description: str = Field('Лучший в мире проект.')
 
-    class Config:
-        env_file = ".env"
-        env_file_encoding = "utf-8"
+
+class TortoiseSettings(PydanticSettings):
+    generate_schemas: bool = Field(True, env="TORTOISE_GENERATE_SCHEMAS")
+    add_exception_handlers: bool = Field(True, env="DATABASE_EXCEPTION_HANDLERS")
+
+
+class DataBaseModels(BaseModel):
+    models: list[str] = Field(
+        [
+            "aerich.models",
+            "database.models.models"
+        ]
+    )
+    default_connection: str = Field("default")
+
+
+class DataBaseSettings(BaseModel):
+    connections: dict = Field(default={"default": DataSettings().db_connection})
+    apps: dict = Field(default={"models": DataBaseModels().dict()})
