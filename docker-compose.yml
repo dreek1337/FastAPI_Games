@@ -2,7 +2,7 @@ version: ${APP_VERSION}
 
 services:
 
-  db:
+  database:
     image: postgres:14-alpine
     restart: always
     environment:
@@ -14,5 +14,17 @@ services:
       - ${DATABASE_PORT}:5432
     volumes:
       - ${DATABASE_PGDATA}
+    env_file:
+      - .env
+
+  fastapi-app:
+    container_name: ${APP_NAME}
+    build: .
+    command: python run.py
+    ports:
+      - ${SITE_PORT}:${SITE_PORT}
+    depends_on:
+      - database
+    restart: always
     env_file:
       - .env
