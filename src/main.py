@@ -6,6 +6,9 @@ from src import games, players
 
 
 def main() -> FastAPI:
+    """
+    Регистрация роутеров и подключение к базе данных
+    """
     app = FastAPI(**app_settings)
 
     app.include_router(games.router)
