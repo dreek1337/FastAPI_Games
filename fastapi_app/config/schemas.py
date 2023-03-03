@@ -42,7 +42,7 @@ class GameInfo(BaseModel):
     game_name: str = Field(..., max_length=50, description='Имя создаваемой игры.')
 
 
-class DatabaseGameResult(GameInfo, BaseModel):
+class DatabaseGameResult(GameInfo):
     """
     Инофрмация об игре из бд
     """
@@ -52,14 +52,14 @@ class DatabaseGameResult(GameInfo, BaseModel):
         orm_mode = True
 
 
-class UserDetails(UserInfo, BaseModel):
+class UserDetails(UserInfo):
     """
     Отображение связи игрока со всеми играми, в которых он был
     """
     all_games: list[DatabaseGameResult] = Field(default=[], description='Список игр, в которых был игрок')
 
 
-class GameDetails(DatabaseGameResult, BaseModel):
+class GameDetails(DatabaseGameResult):
     """
     Отображение связи игрока со всеми играми, в которых он был
     """

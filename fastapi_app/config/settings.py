@@ -29,8 +29,8 @@ class SiteSettings(PydanticSettings):
     """
     Настройки для ювикорна
     """
-    host: str = Field("127.0.0.1", env="SITE_HOST")
-    port: int = Field(8000, env="SITE_PORT")
+    host: str = Field(..., env="SITE_HOST")
+    port: int = Field(..., env="SITE_PORT")
     loop: str = Field("asyncio")
     log_level: str = Field("info", env="SITE_LOG_LEVEL")
     reload_delay: float = Field(0.25, env="SITE_RELOAD_DELAY")
@@ -60,7 +60,7 @@ class DataBaseModels(BaseModel):
     models: list[str] = Field(
         [
             "aerich.models",
-            "database.models.models"
+            "database.models"
         ]
     )
     default_connection: str = Field("default")
