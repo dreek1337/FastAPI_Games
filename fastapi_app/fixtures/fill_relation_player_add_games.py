@@ -8,15 +8,6 @@ from initialization import init
 fake = Faker()
 command_arg = sys.argv[1]
 
-def decor(func):
-    async def inner(*args, **kwargs):
-        import time
-        start = time.time()
-        await func(*args, **kwargs)
-        end = time.time()
-        print(end - start)
-    return inner
-
 
 @decor
 async def relations_create(count: str):
