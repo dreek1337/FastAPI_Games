@@ -22,6 +22,9 @@ class DatabaseSettings(BaseSettings):
 
 
 async def init():
+    """
+    Подключение к бд
+    """
     await Tortoise.init(
         db_url=DatabaseSettings().db_connection,
         modules={'models': [
