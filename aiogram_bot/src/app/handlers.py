@@ -3,7 +3,7 @@ from tortoise.query_utils import Prefetch
 from aiogram import Dispatcher, types
 from aiogram.dispatcher import FSMContext
 
-from config import GameInfo, GameDetails, UserDetails
+from config import GameInfo, GameDetails, UserDetails, UserRegistration, BaseGame
 from database import Games, Players
 from src.app import (GameInformation, PlayerInformation, CreateRelation,
                      DeletePlayer, DeleteGame)
@@ -68,7 +68,7 @@ async def save_phone_number_state(message: types.Message, state: FSMContext):
     player_info = await state.get_data()
 
     try:
-        await Players.create(**player_info, telegram_id=message.from_user.id)
+        await Players.create(**UserRegistration(**player_info, telegram_id=message.from_user.id).dict())
         await message.reply(f'Ура, ты был зарагестрирован: {player_info.get("username")}')
     except Exception as err:
         await message.reply(f'Хм..Ошибочка..Скорей всего вот в чем причина: {err}')
@@ -89,7 +89,7 @@ async def create_game_state(message: types.Message, state: FSMContext):
     Сохранение названия игры в состоянии и использование его в создании
     """
     try:
-        await Games.create(game_name=message.text)
+        await Games.create(**BaseGame(game_name=message.text).dict())
 
         await message.reply('Игра создана.')
 

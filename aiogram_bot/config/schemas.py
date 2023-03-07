@@ -22,7 +22,7 @@ class UserRegistration(UserValidation):
     """
     Валидация пароля
     """
-    password: str = Field(..., min_length=8, max_length=128, description='Пароль игрока.')
+    password: str = Field('Пусто', min_length=8, max_length=128, description='Пароль игрока.')
 
 
 class UserInfo(UserValidation):
