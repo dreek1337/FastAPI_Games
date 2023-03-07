@@ -13,22 +13,26 @@ async def relations_create(count: str):
     """
     Создание связей игрока и игр
     """
-    if count.isdigit():
-        for _ in range(int(count)):
-            id_list = [i for i in range(fake.random_int(min=1, max=len(await Games.all())))]
-            if len(id_list) > 15:
-                relation_games = await Games.filter(id__in=id_list[:fake.random_int(min=0, max=15)])
-            else:
-                relation_games = await Games.filter(id__in=id_list)
+    try:
+        num = int(count)
+        if num <= 15:
+            for _ in range(num):
+                id_list = [i for i in range(fake.random_int(min=1, max=len(await Games.all())))]
+                if len(id_list) > 15:
+                    relation_games = await Games.filter(id__in=id_list[:fake.random_int(min=0, max=15)])
+                else:
+                    relation_games = await Games.filter(id__in=id_list)
 
-            player = await Players.get(id=fake.random_int(
-                    min=1,
-                    max=len(await Players.all()))
-            )
+                player = await Players.get(id=fake.random_int(
+                        min=1,
+                        max=len(await Players.all()))
+                )
 
-            await player.games.add(*relation_games)
-    else:
-        raise 'Введите число!'
+                await player.games.add(*relation_games)
+        else:
+            raise 'Введите число <= 15!'
+    except Exception:
+        raise 'Введите число <= 15!'
 
 
 async def main():

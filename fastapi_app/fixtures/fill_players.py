@@ -13,16 +13,19 @@ async def players_create(count: str):
     """
     Создание игроков
     """
-    if count.isdigit():
-        [await Players.create(username=fake.name(),
-                              age=fake.random_int(min=0, max=100),
-                              email=fake.email(),
-                              phone=fake.random_int(min=70000000000, max=89999999999)
-                              )
-         for _ in range(int(count))]
-
-    else:
-        raise 'Введите число!'
+    try:
+        num = int(count)
+        if num <= 150:
+            [await Players.create(username=fake.name(),
+                                  age=fake.random_int(min=0, max=100),
+                                  email=fake.email(),
+                                  phone=fake.random_int(min=70000000000, max=89999999999)
+                                  )
+             for _ in range(int(count))]
+        else:
+            raise 'Введите число <= 150!'
+    except Exception:
+        raise 'Введите число <= 150!'
 
 
 async def main():
