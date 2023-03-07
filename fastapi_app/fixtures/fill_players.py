@@ -13,19 +13,21 @@ async def players_create(count: str):
     """
     Создание игроков
     """
+    exception_message: str = 'Введите число <= 150!'
+
     try:
         num = int(count)
         if num <= 150:
-            [await Players.create(username=fake.name(),
-                                  age=fake.random_int(min=0, max=100),
-                                  email=fake.email(),
-                                  phone=fake.random_int(min=70000000000, max=89999999999)
-                                  )
-             for _ in range(int(count))]
+            [await Players.create(
+                username=fake.name(),
+                age=fake.random_int(min=0, max=100),
+                email=fake.email(),
+                phone=fake.random_int(min=70000000000, max=89999999999)
+            ) for _ in range(num)]
         else:
-            raise 'Введите число <= 150!'
+            raise exception_message
     except Exception:
-        raise 'Введите число <= 150!'
+        raise exception_message
 
 
 async def main():

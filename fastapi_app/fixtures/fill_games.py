@@ -13,6 +13,7 @@ async def games_create(count: str):
     """
     Создание игр
     """
+
     try:
         num = int(count)
         if num <= 150:
