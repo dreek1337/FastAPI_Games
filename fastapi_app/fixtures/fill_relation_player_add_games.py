@@ -8,14 +8,11 @@ from initialization import init
 fake = Faker()
 command_arg = sys.argv[1]
 
-
-@decor
+# ПЕРЕДЕЛАТЬ РАБОТУ СО СВЯЗЯМИ
 async def relations_create(count: str):
     """
     Создание связей игрока и игр
     """
-    exception_message: str = 'Введите число <= 15!'
-
     try:
         num = int(count)
         if num <= 15:
@@ -37,9 +34,9 @@ async def relations_create(count: str):
 
                 await player.games.add(*relation_games)
         else:
-            raise exception_message
+            raise 'Введите число <= 15!'
     except Exception:
-        raise exception_message
+        raise 'Введите число <= 15!'
 
 
 async def main():
