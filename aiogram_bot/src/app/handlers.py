@@ -78,7 +78,7 @@ async def save_phone_number_state(message: types.Message, state: FSMContext):
 
 async def create_game(message: types.Message):
     """
-    Созлание игры
+    Создание игры
     """
     await message.reply("Придумай название для игры...")
     await GameInformation.game_name.set()
