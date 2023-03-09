@@ -19,9 +19,11 @@ async def games_create(count: str):
         num = int(count)
 
         if num <= 150:
-            [await Games.create(game_name=fake.name()) for _ in range(num)]
+            for _ in range(num):
+                await Games.create(game_name=fake.name())
+
         else:
-            raise 'Введите число <= 150!'
+            raise Exception
 
     except Exception:
         raise 'Введите число <= 150!'

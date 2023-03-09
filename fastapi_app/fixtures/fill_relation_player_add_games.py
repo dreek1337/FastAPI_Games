@@ -8,35 +8,41 @@ from initialization import init
 fake = Faker()
 command_arg = sys.argv[1]
 
-# ПЕРЕДЕЛАТЬ РАБОТУ СО СВЯЗЯМИ
+
 async def relations_create(count: str):
     """
     Создание связей игрока и игр
     """
+    all_games = await Games.all()
+
+    for i in all_games:
+        await i.players.clear()
+
     try:
         num = int(count)
-        if num <= 15:
+
+        if num <= 30:
             for _ in range(num):
-                games_count = await Games.all().count()
-                id_list = [i for i in range(fake.random_int(min=1, max=games_count))]
+                try:
+                    random_index = [fake.random_int(min=0, max=len(all_games))
+                                    for _ in range(fake.random_int(min=0, max=10))]
 
-                if len(id_list) > 15:
-                    size = fake.random_int(min=0, max=15)
-                    relation_games = await Games.filter(id__in=id_list[:size])
-                else:
-                    relation_games = await Games.filter(id__in=id_list)
+                    relation_games = [all_games[i] for i in random_index]
 
-                players_count = await Players.all().count()
-                player = await Players.get(id=fake.random_int(
-                        min=1,
-                        max=players_count
-                ))
+                    all_players = await Players.all()
 
-                await player.games.add(*relation_games)
+                    player = all_players[fake.random_int(min=0, max=len(all_players))]
+
+                    await player.games.add(*relation_games)
+
+                except:
+                    continue
+
         else:
-            raise 'Введите число <= 15!'
+            raise Exception
+
     except Exception:
-        raise 'Введите число <= 15!'
+        raise 'Введите число <= 30!'
 
 
 async def main():
