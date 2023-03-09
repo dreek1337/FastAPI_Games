@@ -1,1 +1,1 @@
-from src.app.state import GameInformation, PlayerInformation, CreateRelation, DeletePlayer, DeleteGame
+from src.app.states import GameInformation, PlayerInformation, CreateRelation, DeletePlayer, DeleteGame

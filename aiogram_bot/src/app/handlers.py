@@ -1,15 +1,14 @@
-from tortoise.query_utils import Prefetch
-
 from aiogram import Dispatcher, types
 from aiogram.dispatcher import FSMContext
 
-from config import GameInfo, GameDetails, UserDetails, UserRegistration, BaseGame
+from config import UserRegistration, BaseGame
 from database import Games, Players
-from src.app import (GameInformation, PlayerInformation, CreateRelation,
-                     DeletePlayer, DeleteGame)
+from src.app import (
+    GameInformation, PlayerInformation, CreateRelation, DeletePlayer, DeleteGame
+)
 
 
-async def create_player(message: types.Message):
+async def registration_player(message: types.Message):
     """
     Регистрация игрока
     """
@@ -185,7 +184,7 @@ def register_handlers(dp: Dispatcher) -> None:
     """
     Регистрация всех хендлеров
     """
-    dp.register_message_handler(create_player, commands='new_player', state=None)
+    dp.register_message_handler(registration_player, commands='new_player', state=None)
     dp.register_message_handler(save_username_state, state=PlayerInformation.username)
     dp.register_message_handler(save_age_state, state=PlayerInformation.age)
     dp.register_message_handler(save_email_state, state=PlayerInformation.email)
