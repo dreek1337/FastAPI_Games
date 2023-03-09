@@ -18,7 +18,7 @@ router = APIRouter(
 
 
 @router.post('/create', response_model=GameInfo, status_code=status.HTTP_201_CREATED)
-async def game_create(game: GameInfo):
+async def create_game(game: GameInfo):
     """
     Регистрация игры
     """
@@ -27,7 +27,7 @@ async def game_create(game: GameInfo):
 
 
 @router.post('/delete', status_code=status.HTTP_204_NO_CONTENT)
-async def game_delete_from_db(game: GameInfo, user: UserInfo = Depends(get_current_user)):
+async def delete_game(game: GameInfo, user: UserInfo = Depends(get_current_user)):
     """
     Удаление игры из базы данных
     """
@@ -46,7 +46,7 @@ async def game_delete_from_db(game: GameInfo, user: UserInfo = Depends(get_curre
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
 
 
-@router.get('/details', response_model=list[GameDetails], status_code=status.HTTP_200_OK)
+@router.get('/list', response_model=list[GameDetails], status_code=status.HTTP_200_OK)
 async def game_details():
     """
     Список всех игр и связанных с ними игроков
@@ -60,8 +60,8 @@ async def game_details():
     return games
 
 
-@router.post('/create-relation', status_code=status.HTTP_201_CREATED)
-async def relation_create(
+@router.post('/bind_relation', status_code=status.HTTP_201_CREATED)
+async def bind_relation(
         game: GameInfo,
         id_users: list = Body()
 ) -> Response:

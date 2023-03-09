@@ -25,7 +25,7 @@ async def user_registration(user: RegistrationUser):
 
 
 @router.get('/list', response_model=list[UserInfo], status_code=status.HTTP_200_OK)
-async def list_users():
+async def users_list():
     """
     Возвращает список всех пользователей
     """
