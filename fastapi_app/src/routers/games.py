@@ -1,16 +1,19 @@
-from fastapi import APIRouter, status, Body
+from fastapi import APIRouter, status, Body, Depends
 from fastapi.responses import Response
 from fastapi.exceptions import HTTPException
 from tortoise.query_utils import Prefetch
 from tortoise.transactions import in_transaction
 
-from config import GameInfo, GameDetails
+from config import GameInfo, GameDetails, UserInfo
 from database import Games, Players
+from src import get_current_user
 
 router = APIRouter(
     prefix='/games',
     tags=['Games'],
-    responses={404: {"description": "Not found"}},
+    responses={404: {"description": "Not found"},
+               403: {"description": "You're not a superuser"}},
+    dependencies=[Depends(get_current_user)]
 )
 
 
@@ -24,14 +27,23 @@ async def game_create(game: GameInfo):
 
 
 @router.post('/delete', status_code=status.HTTP_204_NO_CONTENT)
-async def game_delete_from_db(game: GameInfo):
+async def game_delete_from_db(game: GameInfo, user: UserInfo = Depends(get_current_user)):
     """
     Удаление игры из базы данных
     """
-    try:
-        await Games.filter(**game.dict()).delete()
-    except Exception:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Item not found")
+    print(user.dict())
+    is_superuser = user.is_superuser
+
+    if is_superuser:
+        game = await Games.get(**game.dict())
+
+        if game:
+            await game.delete()
+        else:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+
+    else:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
 
 
 @router.get('/details', response_model=list[GameDetails], status_code=status.HTTP_200_OK)

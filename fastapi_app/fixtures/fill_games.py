@@ -24,7 +24,7 @@ async def games_create(count: str):
 
         else:
             raise Exception
-
+        
     except Exception:
         raise 'Введите число <= 150!'
 

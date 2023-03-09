@@ -72,3 +72,8 @@ class DataBaseSettings(BaseModel):
     """
     connections: dict = Field(default={"default": DataSettings().db_connection})
     apps: dict = Field(default={"models": DataBaseModels().dict()})
+
+
+class TokenSettings(PydanticSettings):
+    key: str = Field(..., env="SECRET_KEY")
+    algorithm: str = Field(..., env="ALGORITHM")

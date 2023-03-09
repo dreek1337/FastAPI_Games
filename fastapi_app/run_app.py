@@ -1,3 +1,5 @@
+from fastapi.security import OAuth2PasswordBearer
+
 from config import site_config
 from src.main import main
 

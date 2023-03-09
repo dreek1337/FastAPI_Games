@@ -10,6 +10,7 @@ class Players(Model):
     phone = fields.CharField(max_length=12)
     password = fields.CharField(max_length=128, default='Пусто', null=False)
     telegram_id = fields.IntField(unique=True, null=True)
+    is_superuser = fields.BooleanField(default=False)
     games = fields.ManyToManyField(
         model_name='models.Games',
         related_name='players',

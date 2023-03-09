@@ -30,6 +30,7 @@ class UserInfo(UserValidation):
     Обработка данных из бд
     """
     id: int = Field(..., description='Айди игрока.')
+    is_superuser: bool = Field(..., description='Отображение, является ли пользователь администратором.')
 
     class Config:
         orm_mode = True
@@ -64,3 +65,18 @@ class GameDetails(DatabaseGameResult):
     Отображение связи игрока со всеми играми, в которых он был
     """
     all_players: list[UserInfo] = Field(default=[], description='Список игроков, которые учавствовали в игре')
+
+
+class Token(BaseModel):
+    """
+    Валидация токена
+    """
+    access_token: str = Field(..., description='Токен для работы с приложением.')
+    token_type: str = Field(..., description='Тип токена.')
+
+
+class TokenData(BaseModel):
+    """
+    данные для токена
+    """
+    username: str | None = Field(default=None, description='Имя пользователя.')

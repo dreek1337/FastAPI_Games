@@ -15,8 +15,8 @@ async def relations_create(count: str):
     """
     all_games = await Games.all()
 
-    for i in all_games:
-        await i.players.clear()
+    for game in all_games:
+        await game.players.clear()
 
     try:
         num = int(count)
