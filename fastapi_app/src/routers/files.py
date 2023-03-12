@@ -58,12 +58,12 @@ async def upload_files(file: UploadFile):
 
 
 @router.get(
-    '/upload/{uuid_file}',
+    '/get_photo/{uuid_file}',
     response_model=bytes,
     status_code=status.HTTP_200_OK,
     dependencies=[Depends(GetUser(UserStatus.DEFAULT_USER.value))]
 )
-async def get_file(uuid_file: str = Path(...)):
+async def get_photo(uuid_file: str = Path(...)):
     """
     Получение файла из minio и отдаем его
     """
