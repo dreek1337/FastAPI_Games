@@ -47,7 +47,7 @@ class GetUser:
     def __init__(self, user_status: str):
         self.user_status = user_status
 
-    async def get_current_user(self, token: str = Depends(oauth2_scheme)):
+    async def __call__(self, token: str = Depends(oauth2_scheme)):
         """
         Получаем корректного пользователя и проверяем на статусы
         """

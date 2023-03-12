@@ -13,11 +13,15 @@ router = APIRouter(
     tags=['Games'],
     responses={404: {"description": "Not found"},
                403: {"description": "You're not a superuser"}},
-    dependencies=[Depends(GetUser.get_current_user)]
 )
 
 
-@router.post('/create', response_model=GameInfo, status_code=status.HTTP_201_CREATED)
+@router.post(
+    '/create',
+    response_model=GameInfo,
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(GetUser(UserStatus.DEFAULT_USER.value))]
+)
 async def create_game(game: GameInfo):
     """
     Регистрация игры
@@ -29,32 +33,25 @@ async def create_game(game: GameInfo):
 @router.post(
     '/delete',
     status_code=status.HTTP_204_NO_CONTENT,
-    dependencies=[Depends(GetUser(UserStatus.SUPERUSER.value).get_current_user)]
+    dependencies=[Depends(GetUser(UserStatus.SUPERUSER.value))]
 )
-async def delete_game(game: GameInfo, user: UserInfo = Depends(GetUser(UserStatus.DEFAULT_USER).get_current_user)):
+async def delete_game(game: GameInfo):
     """
     Удаление игры из базы данных
     """
-    print(user.dict())
-    is_superuser = user.is_superuser
+    game = await Games.get(**game.dict())
 
-    if is_superuser:
-        game = await Games.get(**game.dict())
-
-        if game:
-            await game.delete()
-        else:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
-
+    if game:
+        await game.delete()
     else:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
 
 @router.get(
     '/list',
     response_model=list[GameDetails],
     status_code=status.HTTP_200_OK,
-    dependencies=[Depends(GetUser(UserStatus.DEFAULT_USER.value).get_current_user)]
+    dependencies=[Depends(GetUser(UserStatus.DEFAULT_USER.value))]
 )
 async def game_details():
     """
@@ -72,7 +69,7 @@ async def game_details():
 @router.post(
     '/bind_relation',
     status_code=status.HTTP_201_CREATED,
-    dependencies=[Depends(GetUser(UserStatus.DEFAULT_USER.value).get_current_user)]
+    dependencies=[Depends(GetUser(UserStatus.DEFAULT_USER.value))]
 )
 async def bind_relation(
         game: GameInfo,

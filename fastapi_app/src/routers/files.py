@@ -19,7 +19,7 @@ router = APIRouter(
     '/upload',
     response_model=ResponseFile,
     status_code=status.HTTP_201_CREATED,
-    dependencies=[Depends(GetUser(UserStatus.DEFAULT_USER.value).get_current_user)]
+    dependencies=[Depends(GetUser(UserStatus.DEFAULT_USER.value))]
 )
 async def upload_files(file: UploadFile):
     """
@@ -28,7 +28,7 @@ async def upload_files(file: UploadFile):
     # Продумать что делать с ошибками
     error = HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY)
     regex = re.compile(r'\.(jpg|png|gif)$', re.IGNORECASE).search(file.filename)
-    print(regex)
+    print(regex.string)
     if not regex:
         raise error
 
