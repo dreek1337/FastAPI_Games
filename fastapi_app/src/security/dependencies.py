@@ -1,4 +1,5 @@
 from datetime import timedelta, datetime
+from enum import Enum
 
 from fastapi import Depends, status
 from fastapi.exceptions import HTTPException
@@ -10,6 +11,11 @@ from database import Players
 from config import token_settings, RegistrationUser, TokenData, UserInfo
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
+
+
+class UserStatus(Enum):
+    SUPERUSER = 'superuser'
+    DEFAULT_USER = 'user'
 
 
 async def get_user(username: str):
@@ -37,24 +43,46 @@ async def create_access_token(data: dict, expires_delta: timedelta | None = None
     return encoded_jwt
 
 
-async def get_current_user(token: str = Depends(oauth2_scheme)):
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
-    try:
-        payload = jwt.decode(
-            token=token,
-            key=token_settings.get('key'),
-            algorithms=[token_settings.get('algorithm')])
-        username: str = payload.get("sub")
-        if not username:
+class GetUser:
+    def __init__(self, user_status: str):
+        self.user_status = user_status
+
+    async def get_current_user(self, token: str = Depends(oauth2_scheme)):
+        """
+        Получаем корректного пользователя и проверяем на статусы
+        """
+        credentials_exception = HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not validate credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+        try:
+            payload = jwt.decode(
+                token=token,
+                key=token_settings.get('key'),
+                algorithms=[token_settings.get('algorithm')])
+
+            username: str = payload.get("sub")
+
+            if not username:
+                raise credentials_exception
+            token_data = TokenData(username=username)
+
+        except JWTError:
             raise credentials_exception
-        token_data = TokenData(username=username)
-    except JWTError:
+
+        user = await get_user(username=token_data.username)
+        if user:
+
+            if self.user_status == 'superuser':
+                if not user.is_superuser:
+                    raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
+
+                return user
+
+            elif self.user_status == 'user':
+
+                return user
+
         raise credentials_exception
-    user = await get_user(username=token_data.username)
-    if user is None:
-        raise credentials_exception
-    return user

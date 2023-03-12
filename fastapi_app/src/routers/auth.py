@@ -4,7 +4,8 @@ from fastapi import Depends, APIRouter, status
 from fastapi.exceptions import HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 
-from config import Token
+from config import Token, UserResponse, RegistrationUser
+from database import Players
 from src import authenticate_user, create_access_token
 
 router = APIRouter(tags=['Auth'])
@@ -26,3 +27,16 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
         data={"sub": user.username}, expires_delta=access_token_expires
     )
     return {"access_token": access_token, "token_type": "bearer"}
+
+
+@router.post(
+    '/registration',
+    response_model=UserResponse,
+    status_code=status.HTTP_201_CREATED
+)
+async def user_registration(user: RegistrationUser):
+    """
+    Регистрация пользователя/игрока
+    """
+
+    return await Players.create(**user.dict())

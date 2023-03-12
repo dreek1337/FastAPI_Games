@@ -6,14 +6,14 @@ from tortoise.transactions import in_transaction
 
 from config import GameInfo, GameDetails, UserInfo
 from database import Games, Players
-from src import get_current_user
+from src import GetUser, UserStatus
 
 router = APIRouter(
     prefix='/games',
     tags=['Games'],
     responses={404: {"description": "Not found"},
                403: {"description": "You're not a superuser"}},
-    dependencies=[Depends(get_current_user)]
+    dependencies=[Depends(GetUser.get_current_user)]
 )
 
 
@@ -26,8 +26,12 @@ async def create_game(game: GameInfo):
     return await Games.create(**game.dict())
 
 
-@router.post('/delete', status_code=status.HTTP_204_NO_CONTENT)
-async def delete_game(game: GameInfo, user: UserInfo = Depends(get_current_user)):
+@router.post(
+    '/delete',
+    status_code=status.HTTP_204_NO_CONTENT,
+    dependencies=[Depends(GetUser(UserStatus.SUPERUSER.value).get_current_user)]
+)
+async def delete_game(game: GameInfo, user: UserInfo = Depends(GetUser(UserStatus.DEFAULT_USER).get_current_user)):
     """
     Удаление игры из базы данных
     """
@@ -46,7 +50,12 @@ async def delete_game(game: GameInfo, user: UserInfo = Depends(get_current_user)
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
 
 
-@router.get('/list', response_model=list[GameDetails], status_code=status.HTTP_200_OK)
+@router.get(
+    '/list',
+    response_model=list[GameDetails],
+    status_code=status.HTTP_200_OK,
+    dependencies=[Depends(GetUser(UserStatus.DEFAULT_USER.value).get_current_user)]
+)
 async def game_details():
     """
     Список всех игр и связанных с ними игроков
@@ -60,7 +69,11 @@ async def game_details():
     return games
 
 
-@router.post('/bind_relation', status_code=status.HTTP_201_CREATED)
+@router.post(
+    '/bind_relation',
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(GetUser(UserStatus.DEFAULT_USER.value).get_current_user)]
+)
 async def bind_relation(
         game: GameInfo,
         id_users: list = Body()

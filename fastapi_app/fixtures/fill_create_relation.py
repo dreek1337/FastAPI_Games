@@ -9,7 +9,7 @@ fake = Faker()
 command_arg = sys.argv[1]
 
 
-async def relations_create(count: str):
+async def relations_create(count: str) -> None:
     """
     Создание связей игрока и игр
     """
@@ -45,7 +45,7 @@ async def relations_create(count: str):
         raise 'Введите число <= 30!'
 
 
-async def main():
+async def main() -> None:
     """
     Подключение к бд и передача параметров в функцию создания связей
     """
