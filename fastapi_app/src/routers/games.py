@@ -20,7 +20,7 @@ router = APIRouter(
     '/create',
     response_model=GameInfo,
     status_code=status.HTTP_201_CREATED,
-    dependencies=[Depends(GetUser(UserStatus.DEFAULT_USER.value))]
+    dependencies=[Depends(GetUser(UserStatus.DEFAULT_USER))]
 )
 async def create_game(game: GameInfo):
     """
@@ -33,7 +33,7 @@ async def create_game(game: GameInfo):
 @router.post(
     '/delete',
     status_code=status.HTTP_204_NO_CONTENT,
-    dependencies=[Depends(GetUser(UserStatus.SUPERUSER.value))]
+    dependencies=[Depends(GetUser(UserStatus.SUPERUSER))]
 )
 async def delete_game(game: GameInfo):
     """
@@ -51,7 +51,7 @@ async def delete_game(game: GameInfo):
     '/list',
     response_model=list[GameDetails],
     status_code=status.HTTP_200_OK,
-    dependencies=[Depends(GetUser(UserStatus.DEFAULT_USER.value))]
+    dependencies=[Depends(GetUser(UserStatus.DEFAULT_USER))]
 )
 async def game_details():
     """
@@ -69,7 +69,7 @@ async def game_details():
 @router.post(
     '/bind_relation',
     status_code=status.HTTP_201_CREATED,
-    dependencies=[Depends(GetUser(UserStatus.DEFAULT_USER.value))]
+    dependencies=[Depends(GetUser(UserStatus.DEFAULT_USER))]
 )
 async def bind_relation(
         game: GameInfo,

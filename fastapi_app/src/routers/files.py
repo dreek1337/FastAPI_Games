@@ -1,7 +1,7 @@
-import uuid
 import re
+import uuid
 
-from fastapi import APIRouter, UploadFile, status, HTTPException, Depends, Path, File
+from fastapi import APIRouter, UploadFile, status, HTTPException, Depends, Path
 from fastapi.responses import StreamingResponse
 
 from config import minio_bucket, ResponseFile
@@ -20,7 +20,7 @@ router = APIRouter(
     '/upload',
     response_model=ResponseFile,
     status_code=status.HTTP_201_CREATED,
-    dependencies=[Depends(GetUser(UserStatus.DEFAULT_USER.value))]
+    dependencies=[Depends(GetUser(UserStatus.DEFAULT_USER))]
 )
 async def upload_files(file: UploadFile):
     """
@@ -43,7 +43,7 @@ async def upload_files(file: UploadFile):
             content_type=file.content_type,
             length=file.size
         )
-        print(file.content_type)
+
     except Exception:
         raise error
 
@@ -61,7 +61,7 @@ async def upload_files(file: UploadFile):
     '/get_photo/{uuid_file}',
     response_model=bytes,
     status_code=status.HTTP_200_OK,
-    dependencies=[Depends(GetUser(UserStatus.DEFAULT_USER.value))]
+    dependencies=[Depends(GetUser(UserStatus.DEFAULT_USER))]
 )
 async def get_photo(uuid_file: str = Path(...)):
     """

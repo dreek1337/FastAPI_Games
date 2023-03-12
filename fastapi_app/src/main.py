@@ -1,8 +1,8 @@
 from fastapi import FastAPI
 from tortoise.contrib.fastapi import register_tortoise
 
-from config import TORTOISE_ORM, tortoise_registration_settings, app_settings
 from src import games, players, auth, files
+from config import TORTOISE_ORM, tortoise_registration_settings, app_settings
 
 
 def main() -> FastAPI:

@@ -19,7 +19,7 @@ router = APIRouter(
     '/list',
     response_model=list[UserInfo],
     status_code=status.HTTP_200_OK,
-    dependencies=[Depends(GetUser(UserStatus.DEFAULT_USER.value))]
+    dependencies=[Depends(GetUser(UserStatus.DEFAULT_USER))]
 )
 async def users_list():
     """
@@ -32,7 +32,7 @@ async def users_list():
 @router.post(
     '/delete',
     status_code=status.HTTP_204_NO_CONTENT,
-    dependencies=[Depends(GetUser(UserStatus.SUPERUSER.value))]
+    dependencies=[Depends(GetUser(UserStatus.SUPERUSER))]
 )
 async def user_delete_from_db(user_info: DeleteUser):
     """
@@ -50,7 +50,7 @@ async def user_delete_from_db(user_info: DeleteUser):
     '/details',
     response_model=UserDetails,
     status_code=status.HTTP_200_OK,
-    dependencies=[Depends(GetUser(UserStatus.DEFAULT_USER.value))]
+    dependencies=[Depends(GetUser(UserStatus.DEFAULT_USER))]
 )
 async def user_details(user: UserValidation):
     """

@@ -60,3 +60,4 @@ services:
 volumes:
   minio_data:
   minio_config:
+  
