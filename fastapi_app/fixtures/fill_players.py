@@ -24,7 +24,7 @@ async def players_create(count: str) -> None:
                     username=fake.name(),
                     age=fake.random_int(min=0, max=100),
                     email=fake.email(),
-                    phone=fake.phone()
+                    phone=fake.random_int(min=70000000000, max=80000000000)
                 )
 
         else:

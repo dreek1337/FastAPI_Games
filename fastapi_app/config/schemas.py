@@ -89,5 +89,5 @@ class TokenData(BaseModel):
 
 class ResponseFile(OrmSettings):
     id: int = Field(..., description='ID')
-    image_key: UUID4 = Field(..., description='UUID')
+    file_key: UUID4 = Field(..., description='UUID')
     name: str = Field(..., description='File name.')

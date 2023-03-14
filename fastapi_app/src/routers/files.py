@@ -1,12 +1,12 @@
 import re
 import uuid
 
-from fastapi import APIRouter, UploadFile, status, HTTPException, Depends, Path
+from fastapi import APIRouter, UploadFile, status, HTTPException, Depends, Path, BackgroundTasks
 from fastapi.responses import StreamingResponse
 
 from config import minio_bucket, ResponseFile
-from database import Images
-from src import GetUser, UserStatus
+from database import Files
+from src import GetUser, UserStatus, save_file_in_minio
 from database import minio_client
 
 router = APIRouter(
@@ -22,61 +22,60 @@ router = APIRouter(
     status_code=status.HTTP_201_CREATED,
     dependencies=[Depends(GetUser(UserStatus.DEFAULT_USER))]
 )
-async def upload_files(file: UploadFile):
+async def upload(file: UploadFile, background_task: BackgroundTasks):
     """
     Закрузка файла в minio
     """
     error = HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY)
-    regex = re.compile(r'\.(jpg|png|gif)$', re.IGNORECASE)
+    regex = re.compile(r'\.(jpg|png|gif|mp4|avg)$', re.IGNORECASE)
     file_format = '.' + regex.findall(file.filename)[0]
 
     if not file_format:
         raise error
 
-    image_key = str(uuid.uuid4())
+    file_key = str(uuid.uuid4())
 
-    try:
-        minio_client.put_object(
-            **minio_bucket,
-            object_name=image_key + file_format,
-            data=file.file,
-            content_type=file.content_type,
-            length=file.size
-        )
+    info_for_save = {
+        'file_format': file_format,
+        'file_key': file_key,
+        'content_type': file.content_type,
+    }
 
-    except Exception:
-        raise error
+    background_task.add_task(
+        save_file_in_minio,
+        file_data=file.file,
+        file_size=file.size,
+        **info_for_save
+    )
 
-    save_info_in_db = await Images.create(
-        image_key=image_key,
+    save_info_in_db = await Files.create(
         name=file.filename,
-        file_format=file_format,
-        content_type=file.content_type
+        **info_for_save
     )
 
     return save_info_in_db
 
 
 @router.get(
-    '/get_photo/{uuid_file}',
+    '/get_file/{uuid_file}',
     response_model=bytes,
     status_code=status.HTTP_200_OK,
     dependencies=[Depends(GetUser(UserStatus.DEFAULT_USER))]
 )
-async def get_photo(uuid_file: str = Path(...)):
+async def get_file(uuid_file: str = Path(...)):
     """
     Получение файла из minio и отдаем его
     """
-    image_data = await Images.get(image_key=uuid_file)
+    file_data = await Files.get(file_key=uuid_file)
 
-    if not image_data:
+    if not file_data:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
-    image_name = uuid_file + image_data.file_format
+    file_name = uuid_file + file_data.file_format
 
-    image = minio_client.get_object(
+    file = minio_client.get_object(
         **minio_bucket,
-        object_name=image_name
+        object_name=file_name
     )
 
-    return StreamingResponse(image, media_type=image_data.content_type)
+    return StreamingResponse(file, media_type=file_data.content_type)
