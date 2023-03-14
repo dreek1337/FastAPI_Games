@@ -6,18 +6,22 @@ from tortoise.transactions import in_transaction
 
 from config import GameInfo, GameDetails, UserInfo
 from database import Games, Players
-from src import get_current_user
+from src import GetUser, UserStatus
 
 router = APIRouter(
     prefix='/games',
     tags=['Games'],
     responses={404: {"description": "Not found"},
                403: {"description": "You're not a superuser"}},
-    dependencies=[Depends(get_current_user)]
 )
 
 
-@router.post('/create', response_model=GameInfo, status_code=status.HTTP_201_CREATED)
+@router.post(
+    '/create',
+    response_model=GameInfo,
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(GetUser(UserStatus.DEFAULT_USER))]
+)
 async def create_game(game: GameInfo):
     """
     Регистрация игры
@@ -26,27 +30,29 @@ async def create_game(game: GameInfo):
     return await Games.create(**game.dict())
 
 
-@router.post('/delete', status_code=status.HTTP_204_NO_CONTENT)
-async def delete_game(game: GameInfo, user: UserInfo = Depends(get_current_user)):
+@router.post(
+    '/delete',
+    status_code=status.HTTP_204_NO_CONTENT,
+    dependencies=[Depends(GetUser(UserStatus.SUPERUSER))]
+)
+async def delete_game(game: GameInfo):
     """
     Удаление игры из базы данных
     """
-    print(user.dict())
-    is_superuser = user.is_superuser
+    game = await Games.get(**game.dict())
 
-    if is_superuser:
-        game = await Games.get(**game.dict())
-
-        if game:
-            await game.delete()
-        else:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
-
+    if game:
+        await game.delete()
     else:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
 
-@router.get('/list', response_model=list[GameDetails], status_code=status.HTTP_200_OK)
+@router.get(
+    '/list',
+    response_model=list[GameDetails],
+    status_code=status.HTTP_200_OK,
+    dependencies=[Depends(GetUser(UserStatus.DEFAULT_USER))]
+)
 async def game_details():
     """
     Список всех игр и связанных с ними игроков
@@ -60,7 +66,11 @@ async def game_details():
     return games
 
 
-@router.post('/bind_relation', status_code=status.HTTP_201_CREATED)
+@router.post(
+    '/bind_relation',
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(GetUser(UserStatus.DEFAULT_USER))]
+)
 async def bind_relation(
         game: GameInfo,
         id_users: list = Body()

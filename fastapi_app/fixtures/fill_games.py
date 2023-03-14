@@ -9,7 +9,7 @@ fake = Faker()
 command_arg = sys.argv[1]
 
 
-async def games_create(count: str):
+async def games_create(count: str) -> None:
     """
     Создание игр
     """
@@ -29,7 +29,7 @@ async def games_create(count: str):
         raise 'Введите число <= 150!'
 
 
-async def main():
+async def main() -> None:
     """
     Подключение к бд и передача параметров в функцию создания игр
     """

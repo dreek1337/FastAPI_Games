@@ -21,7 +21,7 @@ class DatabaseSettings(BaseSettings):
         return f"postgres://{self.user}:{self.password}@{self.host}:{self.port}/{self.database}"
 
 
-async def init():
+async def init() -> None:
     """
     Подключение к бд
     """

@@ -1,4 +1,9 @@
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field, UUID4
+
+
+class OrmSettings(BaseModel):
+    class Config:
+        orm_mode = True
 
 
 class UserResponse(BaseModel):
@@ -25,15 +30,18 @@ class RegistrationUser(UserValidation):
     password: str = Field(..., min_length=8, max_length=128, description='Пароль игрока.')
 
 
-class UserInfo(UserValidation):
+class UserInfo(UserValidation, OrmSettings):
     """
     Обработка данных из бд
     """
     id: int = Field(..., description='Айди игрока.')
     is_superuser: bool = Field(..., description='Отображение, является ли пользователь администратором.')
 
-    class Config:
-        orm_mode = True
+
+class DeleteUser(UserResponse):
+    """
+    Схема для удаления игрока
+    """
 
 
 class GameInfo(BaseModel):
@@ -43,14 +51,11 @@ class GameInfo(BaseModel):
     game_name: str = Field(..., max_length=50, description='Имя создаваемой игры.')
 
 
-class DatabaseGameResult(GameInfo):
+class DatabaseGameResult(GameInfo, OrmSettings):
     """
     Инофрмация об игре из бд
     """
     id: int = Field(..., description='Айди игры.')
-
-    class Config:
-        orm_mode = True
 
 
 class UserDetails(UserInfo):
@@ -80,3 +85,9 @@ class TokenData(BaseModel):
     данные для токена
     """
     username: str | None = Field(default=None, description='Имя пользователя.')
+
+
+class ResponseFile(OrmSettings):
+    id: int = Field(..., description='ID')
+    image_key: UUID4 = Field(..., description='UUID')
+    name: str = Field(..., description='File name.')

@@ -22,3 +22,11 @@ class Games(Model):
     id = fields.IntField(pk=True)
     game_name = fields.CharField(max_length=50, unique=True)
     players: fields.ManyToManyRelation['Players']
+
+
+class Images(Model):
+    id = fields.IntField(pk=True)
+    image_key = fields.UUIDField(null=False)
+    name = fields.TextField(null=False)
+    file_format = fields.CharField(max_length=4, null=False)
+    content_type = fields.CharField(max_length=255, null=False)

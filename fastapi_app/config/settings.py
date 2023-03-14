@@ -77,3 +77,14 @@ class DataBaseSettings(BaseModel):
 class TokenSettings(PydanticSettings):
     key: str = Field(..., env="SECRET_KEY")
     algorithm: str = Field(..., env="ALGORITHM")
+
+
+class MinioSettings(PydanticSettings):
+    endpoint: str = Field('127.0.0.1:9001')
+    access_key: str = Field(..., env="MINIO_ACCESS_KEY")
+    secret_key: str = Field(..., env="MINIO_SECRET_KEY")
+    secure: bool = Field(..., env="MINIO_SECURE")
+
+
+class BucketData(PydanticSettings):
+    bucket_name: str = Field(..., env="MINIO_BUCKET_NAME")
