@@ -1,3 +1,4 @@
+from src.background_tasks.dependencies import save_file_in_minio
 from src.security.dependencies import (
     GetUser, get_user, authenticate_user, create_access_token, UserStatus
 )

@@ -24,9 +24,9 @@ class Games(Model):
     players: fields.ManyToManyRelation['Players']
 
 
-class Images(Model):
+class Files(Model):
     id = fields.IntField(pk=True)
-    image_key = fields.UUIDField(null=False)
+    file_key = fields.UUIDField(null=False)
     name = fields.TextField(null=False)
     file_format = fields.CharField(max_length=4, null=False)
     content_type = fields.CharField(max_length=255, null=False)
